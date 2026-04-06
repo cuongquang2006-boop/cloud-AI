@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI # đem class FastAPI từ thư viện fastapi để dùng, mục đích là để thông qua API
 #giao tiếp với server
 from pydantic import BaseModel # dùng để định nghĩa dữ liệu sẽ giao tiếp với API sẽ ra sao
@@ -24,9 +23,8 @@ OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 #list các model free
 MODELS = [
-    "mistralai/mistral-7b-instruct",
-    "openchat/openchat-7b",
-    "meta-llama/llama-3-8b-instruct"
+    "meta-llama/llama-3-8b-instruct:free",
+    "openchat/openchat-7b:free"
 ]
 
 #tạo format dữ liệu chuẩn để gửi/nhận trong quá trình giao tiếp
@@ -56,6 +54,23 @@ def build_prompt(text: str, mode: str):
 def get_random_model():
     return random.choice(MODELS)
 
+# ===== GỌI MODEL (THÊM MỚI) =====
+def call_model(model_name, prompt):
+    return requests.post(
+        OPENROUTER_URL,
+        headers={
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": model_name,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ]
+        },
+        timeout=60
+    )
+
 # ===== MAIN API =====
 @app.post("/ask")
 def ask_ai(prompt: Prompt):
@@ -68,22 +83,16 @@ def ask_ai(prompt: Prompt):
 
         full_prompt = build_prompt(prompt.text, prompt.mode)
 
-        r = requests.post(
-            OPENROUTER_URL,
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": model_name,
-                "messages": [
-                    {"role": "user", "content": full_prompt}
-                ]
-            },
-            timeout=60
-        )
+        # ===== GỌI MODEL =====
+        r = call_model(model_name, full_prompt)
 
         print("📡 STATUS:", r.status_code)
+
+        # ===== FALLBACK NẾU LỖI =====
+        if r.status_code != 200:
+            print("⚠ Model lỗi, thử fallback...")
+            fallback_model = MODELS[0]
+            r = call_model(fallback_model, full_prompt)
 
         if r.status_code != 200:
             print("❌ ERROR:", r.text)
