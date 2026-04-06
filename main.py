@@ -21,7 +21,7 @@ if not OPENROUTER_API_KEY:
     raise ValueError("❌ Không tìm thấy API KEY bro")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-#list các model free
+#list các model free (giữ lại cho có nhưng không dùng nữa)
 MODELS = [
     "meta-llama/llama-3-8b-instruct:free",
     "openchat/openchat-7b:free"
@@ -78,8 +78,9 @@ def ask_ai(prompt: Prompt):
         print("\n==============================")
         print("📩 INPUT:", prompt.text)
 
-        model_name = get_random_model()
-        print("🎲 MODEL:", model_name)
+        # ❌ bỏ random → dùng auto cho ổn định
+        model_name = "openrouter/auto"
+        print("🎯 MODEL AUTO")
 
         full_prompt = build_prompt(prompt.text, prompt.mode)
 
@@ -90,9 +91,8 @@ def ask_ai(prompt: Prompt):
 
         # ===== FALLBACK NẾU LỖI =====
         if r.status_code != 200:
-            print("⚠ Model lỗi, thử fallback...")
-            fallback_model = MODELS[0]
-            r = call_model(fallback_model, full_prompt)
+            print("⚠ Model auto lỗi, thử fallback...")
+            r = call_model("openchat/openchat-7b", full_prompt)
 
         if r.status_code != 200:
             print("❌ ERROR:", r.text)
