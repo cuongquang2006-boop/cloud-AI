@@ -14,7 +14,7 @@
 
 ---
 <p align="center">
-  <img src="./assets/renderlg.jpg" alt="Render Logo" width="120"/>
+  <img src="./assets/renderlg.jpg" alt="Render Logo" width="80"/>
   <br/>
   <sub>Powered by Render</sub>
 </p>
