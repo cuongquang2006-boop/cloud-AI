@@ -13,8 +13,8 @@
 - Try to avoid long idle time if you need fast responses.
 
 ---
-<p align="center">
-  <img src="./assets/renderlg.jpg" alt="Render Logo" width="80"/>
+<p align="left">
+  <img src="./assets/renderlg.jpg" alt="Render Logo" width="60"/>
   <br/>
   <sub>Powered by Render</sub>
 </p>
