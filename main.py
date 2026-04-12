@@ -87,8 +87,7 @@ def ask_ai(prompt: Prompt):
         data = r.json()
         result = data["choices"][0]["message"]["content"].strip()
 
-        return 
-        {
+        return {
             "model": model_name,
             "result": result
         }
